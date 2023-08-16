@@ -15,4 +15,6 @@ export interface ContextSchedulesProps{
     schedule: SchedulesProps[],
     isLoading: boolean
     setPage(page: number):void
+    handleStatus(id: string): void
+    handleCancel(id: string): void
 }

@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useState, useEffect } from 'react'
 import { ContextSchedulesProps, SchedulesProps } from './types'
 import DEFAULT from './contants'
-import axios from 'axios'
 import { ROUTER } from '../../routes/listRoutes'
 import API from 'api'
 export const Context = createContext({} as ContextSchedulesProps)
@@ -15,12 +14,15 @@ export const Provider = ({ children }: { children: ReactNode }) => {
         meta,
         schedule,
         isLoading,
-        setPage
+        setPage,
+        handleStatus,
+        handleCancel
     }
+    
     async function FetchList() {
         setIsLoading(true)
         try {
-            API
+            await API
                 .get(ROUTER.schedules.list, {
                     params: {
                         page: meta.page,
@@ -38,8 +40,28 @@ export const Provider = ({ children }: { children: ReactNode }) => {
     function setPage(page: number){
         setMeta((old) => ({
             ...old,
-            page: page
+            page: page === 0 ? 1 : page 
         }))
+    }
+
+    async function handleStatus(id: string){
+        try {
+            await API.put(ROUTER.schedules.updateStatus(id))
+            FetchList()
+            return
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    async function handleCancel(id: string){
+        try {
+            await API.put(ROUTER.schedules.cancel(id))
+            FetchList()
+            return 
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     useEffect(() => {
